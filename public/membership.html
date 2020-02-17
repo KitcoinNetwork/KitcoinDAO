@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<script type="text/javascript">
+		window.lang = {
+			"balance": "Balance",
+
+		}
+	</script>
+    <script src="./js/Membership-abi.js"></script>
+    <script src="./js/web3-0.20.6.js"></script>
+    <script src="./js/Membership.js"></script>
+	<link rel="stylesheet" href="./css/bootstrap.min.css" >
+	<link rel="stylesheet" href="./css/style.css" >
+	<script src="./js/jquery-3.3.1.min.js"></script>
+	<script src="./js/bootstrap.min.js"></script>
+	<title>KTC Foundation Tok</title>
+</head>
+<body>
+	<!-- https://github.com/shawntabrizi/ERC-20-Token-Balance -->
+	<!-- https://www.ign.com/wikis/realm-royale/Rankings -->
+	<!-- <div class="header"> </div>-->
+	<div class="top whiteball">
+		<h1>KTC Foundation Tok<img class="flag" src="img/china-flag.png"></a></h1>
+	</div>
+	<div class="col pd-lr mt-m4">
+		<div class="dashboard-container">
+			<div class="center">My Tokens: <span id='myTokenNumber'>0</span> JJHB
+			<span id="sendButt" onclick='$("#sendDiv").toggle()'>Send</span>
+			<div id="sendDiv" style="display: none"><hr>
+				<input type='text' placeholder='0Xaddress' id='addrMemberInput' />
+				<input type='text' placeholder='amount' id='amountInput' />
+				<a href='#' onclick='sendTokens();' >Send</a>
+			</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<div class="col pd-lr container">
+		<div class="dashboard-container" >
+			Members: <span id="membersNumber">0</span>
+			<hr>
+			<div id="membersList">
+			</div>
+		</div>
+
+
+		<div class="dashboard-container" id="adminTools">
+
+		</div>
+
+		<div class="dashboard-container" id="roleList">
+			
+		</div>
+
+	</div>
+
+</body>
+
+</html>

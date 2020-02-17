@@ -155,4 +155,3 @@ var foundation_abi = [
       "signature": "0x44276733"
     }
   ]
-  

@@ -1,8 +1,5 @@
-pragma solidity  >=0.4.2;
+pragma solidity  >=0.4.17;
 
-//import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-//import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-//import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**  
 * @title KtcFoundation manages a list of members with roles  
@@ -26,9 +23,9 @@ contract KtcFoundation {
 	
 	
 	//A list of roles
-	uint constant ROLE_ADMIN = 1;
+	uint constant ROLE_ADMIN = 3;
 	uint constant ROLE_MANAGER = 2;
-	uint constant ROLE_MEMBER = 3;
+	uint constant ROLE_MEMBER = 1;
 
 
 	constructor () public {
@@ -74,10 +71,10 @@ contract KtcFoundation {
 	
 	
 	function changeRole(address _address, uint _role) public onlyAdmin {
-		//Role must exist
-		require ( _role < ROLE_MEMBER + 1 );
+		//role among the available roles
+		require ( _role > 0 && _role < ROLE_ADMIN);
 		//_address must be a member
-		require ( memberRole[ _address ] > 0 );
+		require ( memberRole[ _address ] <= ROLE_ADMIN );
 		memberRole[_address] = _role;
 	}
 	

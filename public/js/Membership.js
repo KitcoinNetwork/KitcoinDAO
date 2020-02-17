@@ -78,13 +78,13 @@ function connectContract(){
 		//Prod address
 		//var contractAddress = "0x904235d23F1CCE0bdC2163f6a490D56Ee776bf3F"
 		//Dev address 
-		var contractAddress = "0x64f92bb40b471371fC035006Eb8Fcf8223D01a19";
-		var contractABI = foundation_abi;
+		var contractAddress = "0x303D5B8e28196bfcB9A7b65324E1592E07DF98AA";
+		var contractABI = membership_abi;
 		foundationContract = web3.eth.contract(contractABI).at(contractAddress);
 		
-		foundationContract.getRole(myAccount, function(err, res){
+		/*foundationContract.getRole(myAccount, function(err, res){
 			myRole = res;
-		});
+		});*/
 	}
 }
 	
@@ -99,16 +99,22 @@ function updatePage() {
 
 function updateNetworkStatus(){
 	$('#membersList').empty();
-	/* Updating network status: masternode numbers */
+	/* My token balance */
+	foundationContract.balanceOf(myAccount, function (err, bal){
+		if (err) console.log(err);
+		else {
+			$('#myTokenNumber').text(bal);
+		}
+	});
+	
+	/* Updating foundation status and members*/
 	foundationContract.getMemberCount(function (err, memc) {
-		$("#membersNumber").text(memc);
+		$("#membersNumber").text(memc - 1);
 		
-		
-		for ( memberIndex = 0; memberIndex < memc; memberIndex++){
+		for ( memberIndex = 1; memberIndex < memc; memberIndex++){
 			foundationContract.getMember(memberIndex, function (err, member) {
-				addr = member[0];
-				role = member[1];
-				memberString = '<div>'+shortAdd(addr)+" - "+toRoleString(role) ;
+				addr = member;
+				memberString = '<div>'+shortAdd(addr);//+" - "+toRoleString(role) ;
 				//admin can change roles
 				if ( myRole == 1 ){
 					if ( role > 1 ) {
@@ -121,8 +127,7 @@ function updateNetworkStatus(){
 					}
 				}
 				$('#membersList').append(memberString);
-				console.log(member[0]);
-				console.log(member[1].toNumber());
+				return ;
 			});
 		}
 	});
@@ -141,8 +146,8 @@ function shortAdd(address){
 
 
 
-function addMember(){
-	foundationContract.addMember( $('#addMemberInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
+function sendTokens(){
+	foundationContract.transfer( $('#addrMemberInput').val(),  $('#amountInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
 		if (err) {
 			console.log(err);
 		} else {
@@ -150,15 +155,7 @@ function addMember(){
 		}
 	});
 }
-function delMember(){
-	foundationContract.removeMember( $('#delMemberInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-		} else {
-			updateNetworkStatus();
-		}
-	});
-}
+
 
 function toRole(addr , roleNum){
 	console.log(addr);

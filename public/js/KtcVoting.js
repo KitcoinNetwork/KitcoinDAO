@@ -1,4 +1,4 @@
-var tokenContract;
+var votingContract;
 var userAccount;
 var myRole = 3;
 var myAccount;
@@ -30,7 +30,9 @@ window.addEventListener('load', async () => {
 	//TODO: run after setting contract address
 	//listMyPools();
 	//document.getElementById("address").value = (await web3.eth.getAccounts())[0];
-	myAccount = "0x1e81F9210adD6c747CD33490cE6Ec94226532177";//web3.eth.accounts[0];
+	//myAccount = "0xD3f48e79ba37b170d2406ad8705a2B5A125EA3c0";//
+	myAccount = web3.eth.accounts[1];
+	console.log(myAccount);
 	myRole = 3;
 	connectContract();
 	updatePage();
@@ -74,15 +76,15 @@ function toHex(str){
 
 
 function connectContract(){
-	if ( tokenContract == null ){
+	if ( votingContract == null ){
 		//Prod address
 		//var contractAddress = "0x904235d23F1CCE0bdC2163f6a490D56Ee776bf3F"
 		//Dev address 
-		var contractAddress = "0x64f92bb40b471371fC035006Eb8Fcf8223D01a19";
-		var contractABI = foundation_abi;
-		foundationContract = web3.eth.contract(contractABI).at(contractAddress);
+		var contractAddress = "0x77c7C8C60283eBC3774aE4fCBe4F25530E4edC8A";
+		var contractABI = voting_abi;
+		votingContract = web3.eth.contract(contractABI).at(contractAddress);
 		
-		foundationContract.getRole(myAccount, function(err, res){
+		votingContract.getUserRole(myAccount, function(err, res){
 			myRole = res;
 		});
 	}
@@ -92,83 +94,72 @@ function connectContract(){
 
 function updatePage() {
 	//connectContract();
-	updateNetworkStatus();
+	updateVotingList();
 }
 
 
 
-function updateNetworkStatus(){
-	$('#membersList').empty();
+function promiseGetPoll(pool_id) {
+	return function (err, poll) {
+		console.log(poll);
+		question = fromHex(poll[0]);
+		deadline = poll[1];
+		//is_expired = ( deadline <= (await web3.eth.getBlockNumber()) ? true : false );
+		answers = poll[2];
+		yes = poll[3];
+		majority = poll[4];
+		has_voted = poll[5];
+
+		pollString = '<div>'+question+" - ";
+
+		if ( has_voted == false ){
+			pollString += "<a href='#' onclick='castVote(true, "+pool_id+")'>Yes</a> - <a href='#' onclick='castVote(false, "+pool_id+")'>No</a>"
+		}
+		else {
+			percent = 100 *  yes / answers;
+			pollString += '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:'+percent+'%;"><span class="progressbarvote">'+yes+' Yes</span></div><div class=""><span class="progressbarvote">'+answers+'</span></div></div>';
+		}
+
+		$('#pollsList').append(pollString);
+		return "toto";
+	};
+}
+
+function updateVotingList() {
+	$('#pollsList').empty();
 	/* Updating network status: masternode numbers */
-	foundationContract.getMemberCount(function (err, memc) {
-		$("#membersNumber").text(memc);
+	votingContract.getPollsCount(function (err, memc) {
+		$("#pollsNumber").text(memc);
 		
 		
-		for ( memberIndex = 0; memberIndex < memc; memberIndex++){
-			foundationContract.getMember(memberIndex, function (err, member) {
-				addr = member[0];
-				role = member[1];
-				memberString = '<div>'+shortAdd(addr)+" - "+toRoleString(role) ;
-				//admin can change roles
-				if ( myRole == 1 ){
-					if ( role > 1 ) {
-						roleUp = parseInt(role) - 1;
-						memberString += '<a href="#" onclick="toRole(\''+addr+'\','+roleUp+');">↑</a> ';
-					}
-					if (role < 3){ 
-						roleDown = parseInt(role) + 1;
-						memberString += '<a href="#" onclick="toRole(\''+addr+'\','+roleDown+');">↓</a> ';
-					}
-				}
-				$('#membersList').append(memberString);
-				console.log(member[0]);
-				console.log(member[1].toNumber());
-			});
+		for ( pollIndex = 0; pollIndex < memc; pollIndex++){
+			votingContract.getPoll(pollIndex, {from: myAccount, gas: maxGas}, promiseGetPoll(pollIndex) );
 		}
 	});
 
 }
 
-function toRoleString( roleNumber){
-	if ( roleNumber == 1 ) return "Member";
-	else if ( roleNumber == 2 ) return "Manager";
-	else return "Admin";
-}
 
-function shortAdd(address){
-	return address.substr(0,8) + "..." + address.substr(32);
-}
-
-
-
-function addMember(){
-	foundationContract.addMember( $('#addMemberInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
+function submitNewPoll(){
+	votingContract.createPoll( toHex( $('#questionInput').val() ), {from: myAccount, gas: maxGas}, function (err, res) {
 		if (err) {
 			console.log(err);
 		} else {
-			updateNetworkStatus();
-		}
-	});
-}
-function delMember(){
-	foundationContract.removeMember( $('#delMemberInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-		} else {
-			updateNetworkStatus();
+			updateVotingList();
 		}
 	});
 }
 
-function toRole(addr , roleNum){
-	console.log(addr);
-	console.log(roleNum);
-	foundationContract.changeRole( addr, roleNum , {from: myAccount, gas: maxGas}, function (err, res) {
+/**
+ * @notice Cast vote (yes/no)=(true/false)
+ */
+function castVote(boolVote, pollId){
+	votingContract.castVote( pollId, boolVote, {from: myAccount, gas: maxGas}, function (err, res) {
 		if (err) {
 			console.log(err);
 		} else {
-			updateNetworkStatus();
+			console.log("Cast a "+boolVote+" on poll "+pollId);
+			updateVotingList();
 		}
 	});
 }
-

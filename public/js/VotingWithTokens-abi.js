@@ -1,8 +1,38 @@
-var voting_abi =[
+var voting_abi = [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "LOCK_PERIOD",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x1820cabb"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "VOTE_PERIOD",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xa2facc29"
+    },
     {
       "inputs": [
         {
-          "name": "_foundationContract",
+          "name": "_membershipContract",
           "type": "address"
         }
       ],
@@ -14,17 +44,62 @@ var voting_abi =[
     {
       "constant": true,
       "inputs": [],
-      "name": "getUserRole",
+      "name": "isAdmin",
       "outputs": [
         {
           "name": "",
-          "type": "uint256"
+          "type": "bool"
         }
       ],
       "payable": false,
       "stateMutability": "view",
       "type": "function",
-      "signature": "0xbf04a10d"
+      "signature": "0xb6db75a0"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isMember",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xd02982cf"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "updateMembershipContract",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xccc48940"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getMembershipContract",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x3f6dd239"
     },
     {
       "constant": false,

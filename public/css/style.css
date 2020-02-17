@@ -165,3 +165,19 @@ a {
 .btn-link {
 	color: #4a66ed;
 }
+.center {
+	text-align: center;
+}
+
+.progress, .progress-bar {
+	height: 3rem;
+}
+.progressbarvote {
+	font-size: 2.5rem;
+}
+#sendButt {
+	border: solid 1px black;
+	border-radius: 8px;
+	font-size: 1.7rem;
+	padding: 8px;
+}
