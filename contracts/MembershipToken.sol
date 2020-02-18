@@ -38,8 +38,8 @@ contract MembershipToken is ERC20, ERC20Detailed {
 		ERC20Detailed("JiJinHui", "JJH", 0)
 		public 
 	{  
-		_mint(msg.sender, initial_supply * (uint256(10)**uint256(decimals())));
 		owner = msg.sender;
+		_mint(owner, initial_supply * (uint256(10)**uint256(decimals())));
 		members.push(address(0));
 		memberIndex[owner] = members.push(owner) - 1;
 	}
