@@ -1,7 +1,12 @@
 var votingContract;
 var userAccount;
 var myRole = 3;
-var myAccount;
+
+var contractAddress;
+var ENV = "dev";
+var myAccount ;
+
+
 var maxGas = 4900000;
 window.addEventListener('load', async () => {
     if (window.ethereum) {
@@ -21,17 +26,21 @@ window.addEventListener('load', async () => {
         window.web3 = new Web3(web3.currentProvider);
     } else {
         console.log('No Web3 Detected... using HTTP Provider')
-        window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
-        //window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
+		if (ENV == "dev")	window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
+        else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
+        //else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.57.196/")); //test server
     }
 	//web3.eth.getAccounts(console.log);
 	console.log(web3.version);
 	
-	//TODO: run after setting contract address
-	//listMyPools();
-	//document.getElementById("address").value = (await web3.eth.getAccounts())[0];
-	//myAccount = "0xD3f48e79ba37b170d2406ad8705a2B5A125EA3c0";//
-	myAccount = web3.eth.accounts[0];
+	if (ENV == "dev"){
+		contractAddress = "0x3C25e63ea4Dc5941A9eA0d9b95BcB3Aea5Ae3a52";
+		myAccount = web3.eth.accounts[0];
+	}
+	else {
+		contractAddress = "0x11705A836863707F83f2ca74e5b912cB7Ae4a224";
+		myAccount = web3.eth.accounts[0];
+	}
 	console.log(myAccount);
 	myRole = 3;
 	connectContract();
@@ -77,16 +86,8 @@ function toHex(str){
 
 function connectContract(){
 	if ( votingContract == null ){
-		//Prod address
-		//var contractAddress = "0x904235d23F1CCE0bdC2163f6a490D56Ee776bf3F"
-		//Dev address 
-		var contractAddress = "0x3C25e63ea4Dc5941A9eA0d9b95BcB3Aea5Ae3a52";
 		var contractABI = voting_abi;
 		votingContract = web3.eth.contract(contractABI).at(contractAddress);
-		
-		/*votingContract.getUserRole(myAccount, function(err, res){
-			myRole = res;
-		});*/
 	}
 }
 	
@@ -119,7 +120,11 @@ function promiseGetPoll(pool_id, can_vote) {
 		console.log(poll);
 		question = fromHex(poll[0]);
 		deadline = poll[1];
-		//is_expired = ( deadline <= (await web3.eth.getBlockNumber()) ? true : false );
+		now = Date();
+		
+		console.log(deadline +0);
+		deadline_date = new Date( 1000 * now * ( web3.eth.blockNumber - deadline));
+
 		answers = poll[2];
 		yes = poll[3];
 		majority = poll[4];
@@ -127,7 +132,7 @@ function promiseGetPoll(pool_id, can_vote) {
 
 		pollString = '<div>'+question+" - ";
 
-		if ( ! has_voted && can_vote){
+		if ( ! has_voted && can_vote && deadline > web3.eth.blockNumber){
 			pollString += "<a href='#' onclick='castVote(true, "+pool_id+")'>Yes</a> - <a href='#' onclick='castVote(false, "+pool_id+")'>No</a>"
 		}
 		else {
@@ -156,9 +161,11 @@ function updateVotingList( can_vote ) {
 
 
 function submitNewPoll(){
-	votingContract.createPoll( toHex( $('#questionInput').val() ), {from: myAccount, gas: maxGas}, function (err, res) {
+	var duration = 3600 * 24 * 15;
+	votingContract.createPoll( toHex( $('#questionInput').val() ), duration, {from: myAccount, gas: maxGas}, function (err, res) {
 		if (err) {
 			console.log(err);
+			$('#logs').append("<p>"+err+"</p>");
 		} else {
 			updateVotingList();
 		}
@@ -172,6 +179,7 @@ function castVote(boolVote, pollId){
 	votingContract.castVote( pollId, boolVote, {from: myAccount, gas: maxGas}, function (err, res) {
 		if (err) {
 			console.log(err);
+			$('#logs').append("<p>"+err+"</p>");
 		} else {
 			console.log("Cast a "+boolVote+" on poll "+pollId);
 			updateVotingList();

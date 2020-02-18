@@ -1,8 +1,12 @@
 var tokenContract;
 var userAccount;
 var myRole = 3;
-var myAccount;
 var maxGas = 4900000;
+
+var contractAddress;
+var ENV = "dev";
+var myAccount ;
+
 window.addEventListener('load', async () => {
     if (window.ethereum) {
             window.web3 = new Web3(ethereum);
@@ -21,16 +25,20 @@ window.addEventListener('load', async () => {
         window.web3 = new Web3(web3.currentProvider);
     } else {
         console.log('No Web3 Detected... using HTTP Provider')
-        window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
-        //window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
+        if (ENV == "dev") window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
+        else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
     }
 	//web3.eth.getAccounts(console.log);
 	console.log(web3.version);
-	
-	//TODO: run after setting contract address
-	//listMyPools();
-	//document.getElementById("address").value = (await web3.eth.getAccounts())[0];
-	myAccount = "0x1e81F9210adD6c747CD33490cE6Ec94226532177";//web3.eth.accounts[0];
+
+	if (ENV == "dev"){
+		contractAddress = "0x303D5B8e28196bfcB9A7b65324E1592E07DF98AA";
+		myAccount = web3.eth.accounts[0];
+	}
+	else {
+		contractAddress = "0x542f9db9C3F098d718aea9EE402730969ae915d3";
+		myAccount = web3.eth.accounts[0];
+	}
 	myRole = 3;
 	connectContract();
 	updatePage();
@@ -75,10 +83,6 @@ function toHex(str){
 
 function connectContract(){
 	if ( tokenContract == null ){
-		//Prod address
-		//var contractAddress = "0x904235d23F1CCE0bdC2163f6a490D56Ee776bf3F"
-		//Dev address 
-		var contractAddress = "0x303D5B8e28196bfcB9A7b65324E1592E07DF98AA";
 		var contractABI = membership_abi;
 		foundationContract = web3.eth.contract(contractABI).at(contractAddress);
 		

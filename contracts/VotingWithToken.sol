@@ -84,12 +84,12 @@ contract VotingWithTokens {
 	 * For now simple questions with yes/no answers only
 	 * Deadline can't be changed (will be set to 2 weeks)
 	 */
-	function createPoll( bytes32 _question ) public onlyAdmin {
+	function createPoll( bytes32 _question, uint256 _duration ) public onlyAdmin {
 		uint majority = MembershipToken(membershipContract).totalSupply() / 2 + 1;
 		
 		Poll memory p = Poll({ 
 			question: _question,
-			deadline: block.number + 5,
+			deadline: block.number + _duration,
 			yes: 0,
 			answers: 0,
 			majority: majority

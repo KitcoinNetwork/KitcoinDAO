@@ -107,6 +107,10 @@ var voting_abi = [
         {
           "name": "_question",
           "type": "bytes32"
+        },
+        {
+          "name": "_duration",
+          "type": "uint256"
         }
       ],
       "name": "createPoll",
@@ -114,7 +118,7 @@ var voting_abi = [
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function",
-      "signature": "0xc6befedf"
+      "signature": "0x68fc8092"
     },
     {
       "constant": true,
