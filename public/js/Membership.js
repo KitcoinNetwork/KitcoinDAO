@@ -4,7 +4,7 @@ var myRole = 3;
 var maxGas = 4900000;
 
 var contractAddress;
-var ENV = "dev";
+var ENV = "prod";
 var myAccount ;
 
 window.addEventListener('load', async () => {
@@ -36,7 +36,7 @@ window.addEventListener('load', async () => {
 		myAccount = web3.eth.accounts[0];
 	}
 	else {
-		contractAddress = "0x542f9db9C3F098d718aea9EE402730969ae915d3";
+		contractAddress = "0x505505D056Bfd7F26184CF1de63562d7f7C3281E";
 		myAccount = web3.eth.accounts[0];
 	}
 	myRole = 3;

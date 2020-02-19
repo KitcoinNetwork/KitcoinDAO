@@ -169,6 +169,9 @@ a {
 	text-align: center;
 }
 
+.progress {
+	background-color: #aed9ff;
+}
 .progress, .progress-bar {
 	height: 3rem;
 }

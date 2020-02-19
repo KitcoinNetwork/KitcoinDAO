@@ -3,7 +3,7 @@ var userAccount;
 var myRole = 3;
 
 var contractAddress;
-var ENV = "dev";
+var ENV = "prod";
 var myAccount ;
 
 
@@ -38,7 +38,7 @@ window.addEventListener('load', async () => {
 		myAccount = web3.eth.accounts[0];
 	}
 	else {
-		contractAddress = "0x11705A836863707F83f2ca74e5b912cB7Ae4a224";
+		contractAddress = "0x14944Ec6A7C75E76A1595E3D581997D30ed4380a";
 		myAccount = web3.eth.accounts[0];
 	}
 	console.log(myAccount);
@@ -119,25 +119,23 @@ function promiseGetPoll(pool_id, can_vote) {
 	return function (err, poll) {
 		console.log(poll);
 		question = fromHex(poll[0]);
-		deadline = poll[1];
-		now = Date();
-		
-		console.log(deadline +0);
-		deadline_date = new Date( 1000 * now * ( web3.eth.blockNumber - deadline));
-
+		is_open = poll[1];
 		answers = poll[2];
 		yes = poll[3];
 		majority = poll[4];
 		has_voted = poll[5];
+		no = answers - yes;
+		not_answered = 10000 - yes - no;
 
-		pollString = '<div>'+question+" - ";
+		pollString = '<div class="dashboard-container" ><p style="border-bottom: 1px solid lightgrey;">'+question+'</p>';
 
-		if ( ! has_voted && can_vote && deadline > web3.eth.blockNumber){
+		if ( ! has_voted && can_vote && is_open){
 			pollString += "<a href='#' onclick='castVote(true, "+pool_id+")'>Yes</a> - <a href='#' onclick='castVote(false, "+pool_id+")'>No</a>"
 		}
 		else {
-			percent = 100 *  yes / answers;
-			pollString += '<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:'+percent+'%;"><span class="progressbarvote">'+yes+' Yes</span></div><div class=""><span class="progressbarvote">'+answers+'</span></div></div>';
+			percent_yes = 100 *  yes / answers;
+			percent_no = 100 *  no / answers;
+			pollString += '<p style="font-size: 2rem;"><span  style="color: #dc3545;">是: '+yes+'</span> - <span  style="color: #007bff;">否:'+no+'</span> - 没回答: '+not_answered+'</p><div class="progress"><div class="progress-bar bg-danger" role="progressbar" style="width:'+percent_yes+'%;"><span class="progressbarvote">'+yes+'</span></div></div>';
 		}
 
 		$('#pollsList').append(pollString);
@@ -152,7 +150,7 @@ function updateVotingList( can_vote ) {
 		$("#pollsNumber").text(memc);
 		
 		
-		for ( pollIndex = 0; pollIndex < memc; pollIndex++){
+		for ( pollIndex = memc - 1; pollIndex >= Math.max(0, memc - 5); pollIndex--){
 			votingContract.getPoll(pollIndex, {from: myAccount, gas: maxGas}, promiseGetPoll(pollIndex, can_vote) );
 		}
 	});
@@ -167,7 +165,7 @@ function submitNewPoll(){
 			console.log(err);
 			$('#logs').append("<p>"+err+"</p>");
 		} else {
-			updateVotingList();
+			updateVotingList(true);
 		}
 	});
 }
@@ -182,7 +180,7 @@ function castVote(boolVote, pollId){
 			$('#logs').append("<p>"+err+"</p>");
 		} else {
 			console.log("Cast a "+boolVote+" on poll "+pollId);
-			updateVotingList();
+			updateVotingList(true);
 		}
 	});
 }

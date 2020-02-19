@@ -1,4 +1,4 @@
-var voting_abi = [
+var voting_abi =  [
     {
       "constant": true,
       "inputs": [],
@@ -106,7 +106,7 @@ var voting_abi = [
       "inputs": [
         {
           "name": "_question",
-          "type": "bytes32"
+          "type": "string"
         },
         {
           "name": "_duration",
@@ -118,7 +118,7 @@ var voting_abi = [
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function",
-      "signature": "0x68fc8092"
+      "signature": "0xc7449cb7"
     },
     {
       "constant": true,
@@ -147,11 +147,11 @@ var voting_abi = [
       "outputs": [
         {
           "name": "",
-          "type": "bytes32"
+          "type": "string"
         },
         {
           "name": "",
-          "type": "uint256"
+          "type": "bool"
         },
         {
           "name": "",

@@ -7502,7 +7502,7 @@
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2020-02-18T04:40:16.877Z",
+  "updatedAt": "2020-02-19T07:36:40.440Z",
   "devdoc": {
     "methods": {
       "castVote(uint256,bool)": {

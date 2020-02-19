@@ -37,7 +37,7 @@ contract VotingWithTokens {
 	
 	struct Poll
     {
-        bytes32 question;
+        string question;
 		uint256 deadline;
 		uint yes;
 		uint answers;
@@ -84,7 +84,7 @@ contract VotingWithTokens {
 	 * For now simple questions with yes/no answers only
 	 * Deadline can't be changed (will be set to 2 weeks)
 	 */
-	function createPoll( bytes32 _question, uint256 _duration ) public onlyAdmin {
+	function createPoll( string memory _question, uint256 _duration ) public onlyAdmin {
 		uint majority = MembershipToken(membershipContract).totalSupply() / 2 + 1;
 		
 		Poll memory p = Poll({ 
@@ -108,10 +108,10 @@ contract VotingWithTokens {
 	* @notice Get poll information
 	* @param _id The id of the poll
 	*/
-	function getPoll(uint _id) public view returns ( bytes32, uint, uint, uint, uint, bool, address ){
+	function getPoll(uint _id) public view returns ( string memory, bool, uint, uint, uint, bool, address ){
 		Poll memory p = polls[_id];
 		bool hasVoted = polls[_id].hasVoted[msg.sender];
-		return (p.question, p.deadline, p.answers, p.yes, p.majority, hasVoted, msg.sender);
+		return (p.question, p.deadline >= block.number, p.answers, p.yes, p.majority, hasVoted, msg.sender);
 	}
 	
 	/**
