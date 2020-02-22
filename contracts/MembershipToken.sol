@@ -28,8 +28,10 @@ contract MembershipToken is ERC20, ERC20Detailed {
 	address[] public members;
 	//position of member address in the members list
 	mapping ( address => uint256 ) memberIndex;
+	//bibo member Id for airdrops
+	mapping ( address => string ) memberBibo;
 
-	uint256 public constant initial_supply = 10000;  
+	uint256 public constant initial_supply = 50000;  
 
 	/**  
 	* @dev assign totalSupply to account creating this contract 
@@ -98,6 +100,12 @@ contract MembershipToken is ERC20, ERC20Detailed {
 	function getMember(uint256 index) public view returns (address){
 		return members[index];
 	}
+	/**
+	* @notice Provides the Xth member of the list and its coin balance in one single call
+	*/
+	function getMemberAndBalance(uint256 index) public view returns (address, uint256){
+		return (members[index], balanceOf(members[index]) );
+	}
 	
 	/**
 	* @notice Checks if address is a member
@@ -112,5 +120,20 @@ contract MembershipToken is ERC20, ERC20Detailed {
 	*/
 	function lockUntil(address _address, uint256 _until) public {
 		lockedUntil[ _address ] = _until;
+	}
+	
+	
+	/**
+	* @notice Register a user's Bibo ID for future airdrops
+	*/
+	function registerBibo( string memory _biboID ) public {
+		memberBibo[msg.sender] = _biboID;
+	}
+	
+	/**
+	* @notice Get user's Bibo account name
+	*/
+	function getBiboAccount(address _address)public view returns (string memory){
+		return memberBibo[_address];
 	}
 }

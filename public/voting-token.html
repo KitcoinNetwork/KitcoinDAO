@@ -10,7 +10,7 @@
 	</script>
     <script src="./js/VotingWithTokens-abi.js"></script>
     <script src="./js/Membership-abi.js"></script>
-    <script src="./js/web3-0.20.6.js"></script>
+    <script src="./js/web3-1.2.6.min.js"></script>
     <script src="./js/VotingWithTokens.js"></script>
 	<link rel="stylesheet" href="./css/bootstrap.min.css" >
 	<link rel="stylesheet" href="./css/style.css" >
@@ -38,10 +38,12 @@
 
 
 		<div class="dashboard-container" id="adminTools">
-			<div>
-				<h3>Add Poll</h3>
-				<input type='text' placeholder='Question' id='questionInput' />
-				<a href='#' onclick='submitNewPoll();' >Ask</a>
+			<div class="form-group">
+				<label for="questionInput" >新调查</label>
+				<div class='form-inline'>
+					<input type='text' class='col form-control mr-1' placeholder='请输入问题' id='questionInput' />
+					<input type='submit' class='btn btn-primary'  style="border-radius: 0.25rem" onclick='submitNewPoll();' value=' 提交 ' />
+				</div>
 			</div>
 		</div>
 		

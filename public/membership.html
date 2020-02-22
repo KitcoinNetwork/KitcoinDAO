@@ -9,13 +9,13 @@
 		}
 	</script>
     <script src="./js/Membership-abi.js"></script>
-    <script src="./js/web3-0.20.6.js"></script>
+    <script src="./js/web3-1.2.6.min.js"></script>
     <script src="./js/Membership.js"></script>
 	<link rel="stylesheet" href="./css/bootstrap.min.css" >
 	<link rel="stylesheet" href="./css/style.css" >
 	<script src="./js/jquery-3.3.1.min.js"></script>
 	<script src="./js/bootstrap.min.js"></script>
-	<title>KTC Foundation Tok</title>
+	<title>KTC Foundation</title>
 </head>
 <body>
 	<!-- https://github.com/shawntabrizi/ERC-20-Token-Balance -->
@@ -26,20 +26,41 @@
 	</div>
 	<div class="col pd-lr mt-m4">
 		<div class="dashboard-container">
-			<div class="center">总数: <span id='myTokenNumber'>1万</span> JJHB
+			<div class="center">总数: <span id='TokenNumber'>5万</span> JJHB</div>
 			<div class="center">我的币: <span id='myTokenNumber'>0</span> JJHB
-			<span id="sendButt" onclick='$("#sendDiv").toggle()'>Send</span>
-			<div id="sendDiv" style="display: none"><hr>
-				<input type='text' placeholder='0Xaddress' id='addrMemberInput' />
-				<input type='text' placeholder='amount' id='amountInput' />
-				<a href='#' onclick='sendTokens();' >Send</a>
-			</div>
+				<!--<span id="sendButt" onclick='$("#sendDiv").toggle()'>转账</span>-->
+
 			</div>
 			
 		</div>
 	</div>
 	
 	<div class="col pd-lr container">
+		<!-- Send coins -->
+		<div id="sendDiv" class="dashboard-container">
+			<div id='biboAccountForm' class='form-group'>
+				<label for='biboAccountInput' >转账</label>
+				<input type='text' class="form-control  mb-1" placeholder='请输入投入转账地址' id='addrMemberInput' />
+				<div class="form-inline">
+					<input type='text' class="col form-control mr-1" placeholder='请输入转账数量' id='amountInput' />
+					<input type='submit' class="form-control btn btn-primary" style="border-radius: 0.25rem"  onclick='sendTokens();' value='转账 →' />
+				</div>
+			</div>
+		</div>
+		
+		<!-- Link Bibo Account -->
+		<div class="dashboard-container" id="linkBiboAccount">
+			<div id='biboAccountForm' class='form-group'>
+					<label for='biboAccountInput' >我的币宝账户 : <span id='biboAccount'>无</span></label>
+					<div class="form-inline">
+						<input type='text' class='col form-control mr-1' placeholder='请输入币宝账户' id='biboAccountInput' />
+						<button class="btn btn-primary" style="border-radius: 0.25rem" type="submit" onclick='updateBibo();' >确定 →</button>
+					</div>
+					
+			</div>
+		</div>
+	
+		<!-- Member list -->
 		<div class="dashboard-container" >
 			会员: <span id="membersNumber">0</span>
 			<hr>
@@ -47,17 +68,7 @@
 			</div>
 		</div>
 
-
-		<div class="dashboard-container" id="adminTools">
-
-		</div>
-
-		<div class="dashboard-container" id="roleList">
-			
-		</div>
-
 	</div>
-
 </body>
 
 </html>

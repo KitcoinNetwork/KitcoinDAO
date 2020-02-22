@@ -4,7 +4,7 @@ var myRole = 3;
 var maxGas = 4900000;
 
 var contractAddress;
-var ENV = "prod";
+var ENV = "dev";
 var myAccount ;
 
 window.addEventListener('load', async () => {
@@ -28,16 +28,15 @@ window.addEventListener('load', async () => {
         if (ENV == "dev") window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
         else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
     }
-	//web3.eth.getAccounts(console.log);
 	console.log(web3.version);
-
+	var a = await web3.eth.getAccounts();
+	myAccount = a[1];
+	console.log(myAccount);
 	if (ENV == "dev"){
 		contractAddress = "0x303D5B8e28196bfcB9A7b65324E1592E07DF98AA";
-		myAccount = web3.eth.accounts[0];
 	}
 	else {
 		contractAddress = "0x505505D056Bfd7F26184CF1de63562d7f7C3281E";
-		myAccount = web3.eth.accounts[0];
 	}
 	myRole = 3;
 	connectContract();
@@ -84,7 +83,7 @@ function toHex(str){
 function connectContract(){
 	if ( tokenContract == null ){
 		var contractABI = membership_abi;
-		foundationContract = web3.eth.contract(contractABI).at(contractAddress);
+		foundationContract = new web3.eth.Contract(contractABI, contractAddress);
 		
 		/*foundationContract.getRole(myAccount, function(err, res){
 			myRole = res;
@@ -104,21 +103,28 @@ function updatePage() {
 function updateNetworkStatus(){
 	$('#membersList').empty();
 	/* My token balance */
-	foundationContract.balanceOf(myAccount, function (err, bal){
+	foundationContract.methods.balanceOf(myAccount).call( function (err, bal){
 		if (err) console.log(err);
 		else {
 			$('#myTokenNumber').text(bal);
 		}
 	});
 	
+	foundationContract.methods.getBiboAccount( myAccount).call( function(err, biboAccount){
+		if (biboAccount != "")
+			$('#biboAccount').text(biboAccount);
+	});
+	
 	/* Updating foundation status and members*/
-	foundationContract.getMemberCount(function (err, memc) {
+	foundationContract.methods.getMemberCount().call( function (err, memc) {
+		console.log('Got members count: ' + memc);
 		$("#membersNumber").text(memc - 1);
 		
 		for ( memberIndex = 1; memberIndex < memc; memberIndex++){
-			foundationContract.getMember(memberIndex, function (err, member) {
-				addr = member;
-				memberString = '<div>'+shortAdd(addr);//+" - "+toRoleString(role) ;
+			foundationContract.methods.getMemberAndBalance(memberIndex).call( function (err, member) {
+				addr = member[0];
+				bal = member[1];
+				memberString = '<div>'+shortAdd(addr)+" - "+bal ;
 				//admin can change roles
 				if ( myRole == 1 ){
 					if ( role > 1 ) {
@@ -151,25 +157,30 @@ function shortAdd(address){
 
 
 function sendTokens(){
-	foundationContract.transfer( $('#addrMemberInput').val(),  $('#amountInput').val(), {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-		} else {
+	foundationContract.methods.transfer( $('#addrMemberInput').val(),  $('#amountInput').val() )
+		.send({from: myAccount, gas: maxGas} )
+		.on('transactionHash', function(receipt){
+			
+		})
+		.on('receipt', function(receipt){
 			updateNetworkStatus();
-		}
-	});
+		})
+		.on('error', console.error);
 }
 
-
-function toRole(addr , roleNum){
-	console.log(addr);
-	console.log(roleNum);
-	foundationContract.changeRole( addr, roleNum , {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-		} else {
+function updateBibo(){
+	var bbA = $('#biboAccountInput').val();
+	if ( bbA == "" ){
+		$('#biboAccountInput').addClass('is-invalid');
+		return false;
+	}
+	else {
+		$('#biboAccountInput').removeClass('is-invalid');
+		$('#biboAccountInput').val('');
+	}
+	foundationContract.methods.registerBibo( bbA ).send({from: myAccount, gas: maxGas} )
+		.on('receipt', function(receipt){
 			updateNetworkStatus();
-		}
-	});
+		})
+		.on('error', console.error);
 }
-

@@ -384,6 +384,30 @@ var membership_abi = [
       "constant": true,
       "inputs": [
         {
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getMemberAndBalance",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x9e21e650"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
           "name": "_address",
           "type": "address"
         }
@@ -418,5 +442,40 @@ var membership_abi = [
       "stateMutability": "nonpayable",
       "type": "function",
       "signature": "0x6e0113f8"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_biboID",
+          "type": "string"
+        }
+      ],
+      "name": "registerBibo",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x31060256"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "getBiboAccount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xc5ca4d82"
     }
   ]

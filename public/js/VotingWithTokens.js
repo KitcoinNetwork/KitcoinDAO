@@ -3,7 +3,7 @@ var userAccount;
 var myRole = 3;
 
 var contractAddress;
-var ENV = "prod";
+var ENV = "dev";
 var myAccount ;
 
 
@@ -30,18 +30,17 @@ window.addEventListener('load', async () => {
         else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.152.188/zlMOcq5cppnTUPlMz5wUCOK9udioH7LG"));
         //else window.web3 = new Web3(new Web3.providers.HttpProvider("http://47.244.57.196/")); //test server
     }
-	//web3.eth.getAccounts(console.log);
+	web3.eth.getAccounts(console.log);
 	console.log(web3.version);
-	
+	var a = await web3.eth.getAccounts();
+	myAccount = a[0];
+	console.log(myAccount);
 	if (ENV == "dev"){
 		contractAddress = "0x3C25e63ea4Dc5941A9eA0d9b95BcB3Aea5Ae3a52";
-		myAccount = web3.eth.accounts[0];
 	}
 	else {
 		contractAddress = "0x14944Ec6A7C75E76A1595E3D581997D30ed4380a";
-		myAccount = web3.eth.accounts[0];
 	}
-	console.log(myAccount);
 	myRole = 3;
 	connectContract();
 	updatePage();
@@ -87,7 +86,7 @@ function toHex(str){
 function connectContract(){
 	if ( votingContract == null ){
 		var contractABI = voting_abi;
-		votingContract = web3.eth.contract(contractABI).at(contractAddress);
+		votingContract = new web3.eth.Contract(contractABI, contractAddress);
 	}
 }
 	
@@ -95,15 +94,15 @@ function connectContract(){
 
 function updatePage() {
 	//connectContract();
-	votingContract.getMembershipContract( function(err, res){
+	votingContract.methods.getMembershipContract().call( function(err, res){
 		if (err){
 			console.log(err);
 		}
 		else {
 			var membershipContractAddr = res;
 			var membershipABI = membership_abi;
-			membershipContract = web3.eth.contract(membershipABI).at(membershipContractAddr);
-			membershipContract.balanceOf(myAccount, function(err, myBalance){
+			membershipContract = new web3.eth.Contract(membershipABI, membershipContractAddr);
+			membershipContract.methods.balanceOf(myAccount).call(function(err, myBalance){
 				can_vote = false;
 				if (myBalance > 0) can_vote = true;
 				
@@ -125,7 +124,7 @@ function promiseGetPoll(pool_id, can_vote) {
 		majority = poll[4];
 		has_voted = poll[5];
 		no = answers - yes;
-		not_answered = 10000 - yes - no;
+		not_answered = 50000 - yes - no;
 
 		pollString = '<div class="dashboard-container" ><p style="border-bottom: 1px solid lightgrey;">'+question+'</p>';
 
@@ -146,12 +145,11 @@ function promiseGetPoll(pool_id, can_vote) {
 function updateVotingList( can_vote ) {
 	$('#pollsList').empty();
 	/* Updating network status: masternode numbers */
-	votingContract.getPollsCount(function (err, memc) {
+	votingContract.methods.getPollsCount().call(function (err, memc) {
 		$("#pollsNumber").text(memc);
 		
-		
 		for ( pollIndex = memc - 1; pollIndex >= Math.max(0, memc - 5); pollIndex--){
-			votingContract.getPoll(pollIndex, {from: myAccount, gas: maxGas}, promiseGetPoll(pollIndex, can_vote) );
+			votingContract.methods.getPoll(pollIndex).call({from: myAccount, gas: maxGas}, promiseGetPoll(pollIndex, can_vote) );
 		}
 	});
 
@@ -160,27 +158,22 @@ function updateVotingList( can_vote ) {
 
 function submitNewPoll(){
 	var duration = 3600 * 24 * 15;
-	votingContract.createPoll( toHex( $('#questionInput').val() ), duration, {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-			$('#logs').append("<p>"+err+"</p>");
-		} else {
+	console.log( $('#questionInput').val() );
+	votingContract.methods.createPoll( toHex( $('#questionInput').val() ), duration ).send( {from: myAccount, gas: maxGas})
+		.on('receipt', function (res) {
 			updateVotingList(true);
-		}
-	});
+		})
+		.on('error', console.error);
 }
 
 /**
  * @notice Cast vote (yes/no)=(true/false)
  */
 function castVote(boolVote, pollId){
-	votingContract.castVote( pollId, boolVote, {from: myAccount, gas: maxGas}, function (err, res) {
-		if (err) {
-			console.log(err);
-			$('#logs').append("<p>"+err+"</p>");
-		} else {
+	votingContract.methods.castVote( pollId, boolVote).send( {from: myAccount, gas: maxGas} )
+		.on('receipt', function(receipt){
 			console.log("Cast a "+boolVote+" on poll "+pollId);
 			updateVotingList(true);
-		}
-	});
+		})
+		.on('error', console.error);
 }
