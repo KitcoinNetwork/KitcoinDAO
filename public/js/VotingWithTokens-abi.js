@@ -103,6 +103,16 @@ var voting_abi =  [
     },
     {
       "constant": false,
+      "inputs": [],
+      "name": "toggleStatus",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xc02857bd"
+    },
+    {
+      "constant": false,
       "inputs": [
         {
           "name": "_question",

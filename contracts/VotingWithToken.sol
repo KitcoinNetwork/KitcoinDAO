@@ -21,10 +21,12 @@ contract VotingWithTokens {
 	
 	modifier onlyAdmin(){
 		require( isAdmin() == true, "Unauthorized action");
+		require( enabled == true, "Contract disabled");
 		_;
 	}
 	modifier onlyMember(){
 		require( isMember() == true, "Unauthorized action");
+		require( enabled == true, "Contract disabled");
 		_;
 	}
 	
@@ -72,11 +74,19 @@ contract VotingWithTokens {
 		membershipContract = _address;
 	}
 	/**
-	 * @notice returns membership contract address
-	 */
-	 function getMembershipContract() public view returns (address){
-		 return membershipContract;
-	 }
+	* @notice returns membership contract address
+	*/
+	function getMembershipContract() public view returns (address){
+		return membershipContract;
+	}
+	 
+	/**
+	* @notice Toggles the contract on/off
+	*/
+	function toggleStatus() public onlyOwner {
+		if ( enabled == true ) enabled = false;
+		else enabled = true;
+	}
 	
 	/**
 	 * @notice Creates a new poll

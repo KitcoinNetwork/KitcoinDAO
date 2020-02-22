@@ -3,7 +3,7 @@ var userAccount;
 var myRole = 3;
 
 var contractAddress;
-var ENV = "dev";
+var ENV = "prod";
 var myAccount ;
 
 
@@ -36,7 +36,7 @@ window.addEventListener('load', async () => {
 	myAccount = a[0];
 	console.log(myAccount);
 	if (ENV == "dev"){
-		contractAddress = "0x3C25e63ea4Dc5941A9eA0d9b95BcB3Aea5Ae3a52";
+		contractAddress = "0x77c7C8C60283eBC3774aE4fCBe4F25530E4edC8A";
 	}
 	else {
 		contractAddress = "0x14944Ec6A7C75E76A1595E3D581997D30ed4380a";
@@ -116,7 +116,7 @@ function updatePage() {
 
 function promiseGetPoll(pool_id, can_vote) {
 	return function (err, poll) {
-		console.log(poll);
+		//console.log(poll);
 		question = fromHex(poll[0]);
 		is_open = poll[1];
 		answers = poll[2];
